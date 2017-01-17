@@ -1,19 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RestClient.DotNetCore
 {
     public class Retry
     {
-        public bool RetryRequest(int retries)
+        public async Task<HttpResponseMessage> RetryRequest(int retries, Func<string, Task<HttpResponseMessage>> request, string url)
         {
+            HttpResponseMessage response = null;
+
             for (int i = 0; i < retries; i++)
             {
-                var response = 1+1; //request
+                response = await request(url);
+                if (response.IsSuccessStatusCode)
+                    return response;
             }
 
-            return true;
+            return response;
         }
     }
 }
